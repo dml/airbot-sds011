@@ -1,0 +1,4 @@
+open ws:192.168.1.121,wemos
+putc config.py
+put boot.py
+put webrepl_cfg.py
