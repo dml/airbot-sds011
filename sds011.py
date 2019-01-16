@@ -20,6 +20,10 @@ import sys
 import utime as time
 
 
+class UnexpectedValue(Exception):
+    pass
+
+
 class SDS011:
     def __init__(self):
         self.uart0 = machine.UART(0, 9600)
@@ -38,6 +42,12 @@ class SDS011:
             print('Problem attempting to read:', e)
             sys.print_exception(e)
 
+    def validate(self, value):
+        if 0.0 <= value <= 999.9:
+            pass
+        else:
+            raise UnexpectedValue()
+
     def response(self, payload):
         pass
 
@@ -51,7 +61,18 @@ class SDS011:
             isvalid = checksum == (sum(data) % 256)
             iscomplete = tail == b'\xab'
             status = 'OK' if (isvalid and iscomplete) else 'NOK'
+
+            print('pm2.5:', pm25, 'pm10:', pm10, 'status:', status)
+
+            self.validate(pm25)
+            self.validate(pm10)
+
             return (pm25, pm10, status)
+
         except Exception as e:
             print('Problem decoding packet:', e)
             sys.print_exception(e)
+
+        except UnexpectedValue:
+            pass
+

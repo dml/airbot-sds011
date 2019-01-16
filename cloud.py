@@ -3,10 +3,9 @@ from umqtt.robust import MQTTClient
 
 
 class Report:
-    def __init__(self, client_id):
-        self.client_id = client_id
+    def __init__(self):
         self.mqtt = MQTTClient(
-            client_id=client_id,
+            client_id=config.MQTT_CLIENT_ID,
             server=config.MQTT_HOST,
             port=config.MQTT_PORT,
             user=config.MQTT_USER,
@@ -17,17 +16,19 @@ class Report:
         self.mqtt.connect()
 
     def publish(self, metric, value):
-        topic = 'sensors/{}/{}'.format(self.client_id, metric)
-        message = '{},{},{}'.format(self.client_id, metric, value)
-        self.mqtt.publish(topic, message)
+        topic = '{}/feeds/{}'.format(
+            config.MQTT_USER,
+            metric
+        )
+        # message = 'particulate_matter,mgpcm={}'.format(value)
+        self.mqtt.publish(topic, str(value))
 
     def compose(self, pm2_5, pm10, status):
-        self.publish('status', status)
         self.publish('pm2_5', pm2_5)
         self.publish('pm10', pm10)
 
 
-def connect(client_id):
-    report = Report(client_id)
+def connect():
+    report = Report()
     report.connect()
     return report

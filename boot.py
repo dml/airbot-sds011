@@ -1,9 +1,9 @@
 import gc
 import webrepl
 import time
-from sensor import network
+import wireless
 gc.collect()
 
-network.connect()
+wireless.connect()
 webrepl.start()
 time.sleep_ms(1000)
